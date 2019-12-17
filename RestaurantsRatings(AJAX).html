@@ -1,0 +1,185 @@
+<!doctype html>
+<html>
+<head>
+<title>Assessment 2</title>
+<style>
+#fonts{
+        font-family: "Tahoma", Geneva, sans-serif;
+        border-collapse: collapse;
+        width: 75%;
+        }
+td, th, tr{
+            border: 1px solid #ddd;
+            padding: 8px;
+        }
+        th {
+              padding-top: 12px;
+              padding-bottom: 12px;
+              text-align: left;
+              background-color: #858585;
+              color: white;
+			  text-align: center;
+            }
+			td {
+			font-size: 15px;
+			white-space: nowrap;
+			}
+
+#tbl	{
+	width: 75%;
+	}
+
+#mydiv {
+       text-align: center;
+	   }
+
+	   form {
+	    padding-top: 6px;
+
+	   }
+
+
+</style>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.12.1/jquery-ui.min.js"></script>
+<link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/smoothness/jquery-ui.css">
+<script type="text/javascript">
+
+
+
+
+//creates the table with all the values from the php file
+	function loadData(page) {
+ $.getJSON("https://www.cs.kent.ac.uk/people/staff/yh/co539_a2_data/hygiene.php?op=get&page=" + page, function(result){
+ var data = [];
+data += '<tr><th>Business</th><th>Address</th><th>Type</th><th>Hygiene Rating</th><th>Date</th></tr>';
+ $.each(result, function(key, value) {
+ data += '<tr>';
+ data += '<td>' +  value.business + '</td>';
+ data += '<td>' +  value.address +  '</td>';
+ data += '<td>' +  value.type + '</td>';
+ data += '<td>' +  value.rating + '</td>';
+ data += '<td>' +  value.date + '</td>';
+ //Rating button that has the name of the business as value
+ data += '<td> <button type="button" id="rating" value="' + value.business +'">Get Rating</button> </td>'
+ data += '</tr>';
+  });
+  //Creates the table
+ $('#tbl').append(data);
+  });
+	 }
+
+	 //starting array of selected businesses
+	 var availableBusinesses =["14 Forty FM Services - Compass Group",  "4Degrees",  "A And Z Fisheries",  "AA Markets Cafeteria"];
+
+	 //on document load do the function and create the table with page number 1
+	 $(document).ready( function (){
+	 loadData(1);
+
+	 //on click of rating button
+	 //gets the specific business and gets the average rating and total ratings
+	 $(document).on("click", "button#rating", function() {
+	 var business = $(this).val();
+	 $.getJSON("https://www.cs.kent.ac.uk/people/staff/yh/co539_a2_data/rating.php?businessName=" + business, function(result){
+	  var alertString = [];
+      var found = false;
+       $.each(result, function(key, value){
+		alertString += 'Average Rating: ';
+        alertString += value.avgRating + ' ';
+		alertString += 'Total Ratings: ';
+		alertString += value.totalRatings;
+		 //prints these rating to a popup window
+        alert(alertString);
+        found = true;
+		});
+        if(found ===false){
+            alert("No ratings found")}
+                });
+			});
+
+	//on click of page buttons reload the corresponding page
+	function buttonClick(page) {
+	//clears the table
+	$('#tbl').html("");
+	loadData(page);
+	}
+
+	//create the page buttons
+	//gets the number of pages by the php call
+	//and creates the corresponding buttons
+	$.getJSON("https://www.cs.kent.ac.uk/people/staff/yh/co539_a2_data/hygiene.php?op=pages", function(result){
+	var pages = result.pages;
+	for(i=0;i < pages; i++){
+	var button = document.createElement("BUTTON");
+	button.id = i + 1;
+	button.innerHTML = i + 1;
+	button.onclick = function(){
+	buttonClick(this.id)
+	}
+	var node = document.getElementById("mydiv");
+	node.appendChild(button);
+	}
+	});
+
+
+
+	 //search a business
+	  $("#searchForm").submit(function(event){
+		event.preventDefault();
+		//cleares the table
+		 $('#tbl').html("");
+ $.getJSON("https://www.cs.kent.ac.uk/people/staff/yh/co539_a2_data/hygiene.php?op=search&business=" + $("input").first().val(), function(result){
+ var data = [];
+data += '<tr><th>Business</th><th>Address</th><th>Type</th><th>Hygiene Rating</th><th>Date</th></tr>';
+ $.each(result, function(key, value) {
+ data += '<tr>';
+ data += '<td>' +  value.business + '</td>';
+ data += '<td>' +  value.address +  '</td>';
+ data += '<td>' +  value.type + '</td>';
+ data += '<td>' +  value.rating + '</td>';
+ data += '<td>' +  value.date + '</td>';
+ data += '<td> <button type="button" id="rating" value="' + value.business +'">Get Rating</button> </td>'
+ data += '</tr>';
+
+ //checks if the business searched is in the array and adds it if not
+ if (!($.inArray(value.business, availableBusinesses) > -1)) {
+ availableBusinesses.push(value.business);
+ }
+
+  });
+  //creates the table
+ $('#tbl').append(data);
+  });
+	 });
+
+
+	 //using autocmplete in the search box
+	         $("#searchBox").autocomplete({
+            source: availableBusinesses
+        });
+
+
+	 });
+
+
+</script>
+<title align="center"> Restaurant Ratings </title>
+<h1 align="center"> Restaurant Ratings</h1>
+<p align="center"> This table contains all the ratings of the all the restaurants in Maidstone(Hygene Ratings and Customer Ratings)</p>
+</head>
+
+<body>
+
+<table id="tbl" align="center" >
+
+</table>
+<div id="mydiv"> </div>
+
+
+<form id ="searchForm" align ="center" class="search">
+            <label>Search Business: </label>
+            <input type="text" placeholder="Search.." id="searchBox" name="search">
+             <input type="submit">
+            </form>
+</body>
+</html>
