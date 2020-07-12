@@ -1,0 +1,169 @@
+-- Insert your SQL here-- Insert your SQL here
+SELECT 'Current user login is ' || CURRENT_USER;
+ALTER ROLE gd309 WITH PASSWORD '6-6-2000aA';
+
+--task1
+DROP TABLE IF EXISTS Test;
+Drop Table IF EXISTS Centre;
+DROP TABLE IF EXISTS Client;
+DROP TABLE IF EXISTS Lesson;
+
+DROP TABLE IF EXISTS AdminStaff;
+DROP TABLE IF EXISTS Instructor;
+DROP TABLE IF EXISTS School;
+DROP TABLE IF EXISTS Car;
+
+CREATE TABLE Centre (
+ CentreID INTEGER PRIMARY KEY CHECK (CentreID > 0),
+ Name VARCHAR(255) NOT NULL,
+ Address VARCHAR(255) NOT NULL,
+ PhoneNo VARCHAR(20) NOT NULL
+);
+
+CREATE TABLE Car (
+ CarID VARCHAR(255) PRIMARY KEY,
+ RegNo VARCHAR(255) UNIQUE NOT NULL,
+ Model VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE School (
+ SchoolID INTEGER PRIMARY KEY CHECK (SchoolID > 0),
+ Address VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE AdminStaff (
+ EmpID VARCHAR(4) PRIMARY KEY,
+ Forename VARCHAR(255) NOT NULL,
+ Surname VARCHAR(255) NOT NULL,
+ Gender CHAR(1) CHECK (Gender IN('F','M','O')) NOT NULL,
+ PhoneNo VARCHAR(20) NOT NULL,
+ Address VARCHAR(255) NOT NULL,
+ Role VARCHAR(255) NOT NULL,
+ SchoolID INTEGER NOT NULL,
+ FOREIGN KEY (SchoolID) REFERENCES School (SchoolID)
+);
+
+CREATE TABLE Instructor (
+ EmpID VARCHAR(4) PRIMARY KEY,
+ Forename VARCHAR(255) NOT NULL,
+ Surname VARCHAR(255) NOT NULL,
+ Gender CHAR(1) CHECK (Gender IN('F','M','O')) NOT NULL,
+ PhoneNo VARCHAR(20) NOT NULL,
+ Address VARCHAR(255) NOT NULL,
+ LicenceNo VARCHAR(255) UNIQUE NOT NULL,
+ SchoolID INTEGER NOT NULL,
+ FOREIGN KEY (SchoolID) REFERENCES School (SchoolID),
+ CarID VARCHAR(255) NOT NULL,
+ FOREIGN KEY (CarID) REFERENCES Car (CarID)
+);
+
+CREATE TABLE Client (
+ ClientID INTEGER PRIMARY KEY CHECK (ClientID > 0),
+ Forename VARCHAR(255) NOT NULL,
+ Surname VARCHAR(255) NOT NULL,
+ Gender CHAR(1) CHECK (Gender IN('F','M','O')) NOT NULL,
+ DoB VARCHAR(20) NOT NULL,
+ PhoneN0 VARCHAR(20) NOT NULL,
+ Address VARCHAR(255) NOT NULL,
+ ProvlicenceNo VARCHAR(255) UNIQUE NOT NULL
+);
+
+CREATE TABLE Lesson (
+ OnDate DATE NOT NULL,
+ OnTime TIME (0) NOT NULL, 
+ ClientID INTEGER NOT NULL,
+ PRIMARY KEY (OnDate, OnTime, ClientID),
+ EmpID VARCHAR(4) NOT NULL,
+ FOREIGN KEY (EmpID) REFERENCES Instructor (EmpID)
+);
+
+CREATE TABLE Test (
+ OnDate DATE NOT NULL,
+ OnTime TIME (0) NOT NULL,
+ ClientID INTEGER NOT NULL,
+ PRIMARY KEY (OnDate, OnTime, ClientID),
+ EmpID VARCHAR(4) NOT NULL,
+ FOREIGN KEY (EmpID) REFERENCES Instructor (EmpID),
+ CentreID INTEGER NOT NULL,
+ FOREIGN KEY (CentreID) REFERENCES Centre (CentreID),
+ Status VARCHAR(255) CHECK (Status IN('Not Taken', 'Passed', 'Failed')) NOT NULL,
+ Reason VARCHAR(255)
+);
+
+--Insert starting values in the tables.
+Insert into Centre (CentreID, Name, Address, PhoneNo) values (1, 'Canterbury', '12 Meryl Street', '+44 1227-968-5287');
+Insert into Centre (CentreID, Name, Address, PhoneNo) values (2, 'Whitstable', '5 The Strand, Whitstable', '01227457012');
+Insert into Centre (CentreID, Name, Address, PhoneNo) values (3, 'Faversham', '1 High Street', '01795 865129');
+
+Insert into Car (CarID, RegNo, Model) values ('124', 'BD51 SMR', 'VW Polo');
+Insert into Car (CarID, RegNo, Model) values ('653', 'WS62 QWE', 'Ford Focus');
+Insert into Car (CarID, RegNo, Model) values ('912', 'FD52 TGF', 'VW Polo');
+Insert into Car (CarID, RegNo, Model) values ('167', 'FD52 YTR', 'VW Polo');
+
+
+Insert into School(SchoolID, Address) values (1, '12 Whitechapel, Canterbury');
+Insert into School(SchoolID, Address) values (2, '9 Middle Wall, Whitstable');
+
+Insert into AdminStaff(EmpID, Forename, Surname, Gender, PhoneNo, Address, Role, SchoolID) values ('1006', 'Fred', 'Grimes', 'M', '012275435665', '27 Cherry Street', 'assistant', '1');
+Insert into AdminStaff(EmpID, Forename, Surname, Gender, PhoneNo, Address, Role, SchoolID) values ('1009', 'Jill', 'Joffries', 'F', '+44776618645', '27 Cherry Street', 'manager', '1');
+Insert into AdminStaff(EmpID, Forename, Surname, Gender, PhoneNo, Address, Role, SchoolID) values ('1019', 'Justine', 'Joffries', 'F', '(01227) 812035', '19 Creosote Road', 'assistant', '1');
+
+Insert into Instructor(EmpID, Forename, Surname, Gender, PhoneNo, Address, LicenceNo, SchoolID, CarID) values ('2009', 'James', 'Joffries', 'M', '012275435665', '27 Cherry Street', 'FTR76398', '1', '124');
+Insert into Instructor(EmpID, Forename, Surname, Gender, PhoneNo, Address, LicenceNo, SchoolID, CarID) values ('2011', 'Jim', 'Adams', 'M', '065490125674', '4 The Vale', 'TGY98555a', '2', '912');
+Insert into Instructor(EmpID, Forename, Surname, Gender, PhoneNo, Address, LicenceNo, SchoolID, CarID) values ('2013', 'Trinny', 'Vair', 'F', '0044587208725', '17 High Street, Chartham', 'YHF7665467', '1', '653');
+
+Insert into Client(ClientID, Forename, Surname, Gender, DoB, PhoneN0, Address, ProvlicenceNo) values (1, 'Andy', 'Twill', 'M', '1998-02-01', '0044678412349876', '27 Cherry Street, CT4 7NF', 'TYH7890');
+Insert into Client(ClientID, Forename, Surname, Gender, DoB, PhoneN0, Address, ProvlicenceNo) values (2, 'Sue', 'Adams', 'F', '1989-06-14 ', '0841-234-876', '45 Eggy Lane', 'CIO67891');
+Insert into Client(ClientID, Forename, Surname, Gender, DoB, PhoneN0, Address, ProvlicenceNo) values (3, 'Jean', 'Adams', 'F', '2001-11-19', '01227765329', '4 Harkness Lane, Canterbury', 'RTY678923');
+
+Insert into Lesson(OnDate, OnTime, ClientID, EmpID) values ('2017-06-24', '10:00:00', 1, '2011');
+Insert into Lesson(OnDate, OnTime, ClientID, EmpID) values ('2019-06-07', '10:00:00', 2, '2009');
+Insert into Lesson(OnDate, OnTime, ClientID, EmpID) values ('2017-07-12', '14:00:00', 1, '2011');
+Insert into Lesson(OnDate, OnTime, ClientID, EmpID) values ('2017-08-19', '16:00:00', 1, '2011');
+Insert into Lesson(OnDate, OnTime, ClientID, EmpID) values ('2020-08-17', '16:00:00', 2, '2011');
+Insert into Lesson(OnDate, OnTime, ClientID, EmpID) values ('2020-08-01', '14:00:00', 1, '2009');
+
+Insert into Test(OnDate, OnTime, ClientID, EmpID, CentreID, Status, Reason) values ('2018-03-01', '11:00:00', 1, '2009', 2, 'Passed', null);
+Insert into Test(OnDate, OnTime, ClientID, EmpID, CentreID, Status, Reason) values ('2019-08-13', '13:00:00', 2, '2011', 3, 'Failed', 'Lack of Observation');
+Insert into Test(OnDate, OnTime, ClientID, EmpID, CentreID, Status, Reason) values ('2019-10-21', '11:00:00', 2, '2011', 2, 'Failed', 'Speeding');
+Insert into Test(OnDate, OnTime, ClientID, EmpID, CentreID, Status, Reason) values ('2020-08-19', '10:00:00', 2, '2009', 2, 'Not Taken', null);
+
+--2)
+-- 2.1) List the date, time and surname for all lessons with instructors who live on Cherry Street. 
+--ok
+SELECT l.OnDate, l.OnTime, i.Surname from Lesson l INNER JOIN Instructor i ON l.EmpID = i.EmpID where i.Address LIKE '%Cherry Street%';
+
+--2.2) Output the status and the count of each status for tests taken by female clients, if the count is greater than zero. 
+--ok
+SELECT t.Status, count(Status) from Test t INNER JOIN Client c ON t.ClientID = c.ClientID where c.Gender = 'F' Group BY Status having count(status)>0;
+
+--2.3)Output the employee ID, forename and surname of all employees with surname 'Joffries', both AdminStaff and Instructors. 
+--ok
+SELECT EmpID, Forename, Surname
+FROM  Instructor as i
+WHERE  i.Surname LIKE '%Joffries%'
+
+UNION ALL
+
+SELECT EmpID, Forename, Surname
+FROM  AdminStaff as a
+WHERE  a.Surname LIKE '%Joffries%';
+
+--2.4) Give the school address, school ID, forename and surname of all instructors who do not currently have a lesson in the database. 
+--ok
+SELECT s.Address, s.SchoolID, Forename, Surname from School s INNER JOIN Instructor i ON s.SchoolID = i.SchoolID WHERE NOT EXISTS
+(SELECT ClientID FROM Lesson WHERE EmpID = i.EmpID);
+
+--2.5) For all tests at the 'Whitstable' centre, given the centre name, date, time, test status, client forename, client surname, school address for the accompanying Instructor and car model for the accompanying instructor. Sort alphabetically A to Z by client surname then client forename. 
+--ok
+SELECT ce.Name, te.OnDate, te.OnTime, te.Status, c.Forename, c.Surname, sc.Address, ca.Model from Centre ce 
+INNER JOIN Test te ON ce.CentreID = te.CentreID 
+INNER JOIN Client c ON te.ClientID = c.ClientID 
+INNER JOIN Instructor i ON te.EmpID = i.EmpID 
+INNER JOIN School sc ON i.SchoolID = sc.SchoolID
+Inner JOIN Car ca ON i.CarID = ca.CarID 
+WHERE ce.Name Like  '%Whitstable%' ORDER BY Surname ASC, Forename ASC; 
+
+--2.6) Change all Lessons on or after 12/06/2020 with the Instructor James Joffries to be with the instructor Jim Adams.
+--ok
+UPDATE Lesson Set EmpID = '2011' where EmpID = '2009' AND OnDate> '2020-06-11';
